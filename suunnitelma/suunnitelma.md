@@ -1,28 +1,25 @@
 # Harjoitustyön suunnitelma
 
-(Täydennä oman pelisi tiedot tähän tiedostoon muokkaamalla 
-tiedostoa tekstieditorissa. Käytä [Markdown-syntaksia](https://about.gitlab.com/handbook/markdown-guide/).
-Poista sitten *kaikki* suluilla merkityt kohdat.)
-
 ## Tietoja 
 
-Tekijä: (Etunimi Sukunimi)
+Tekijä: Lempi Leinonen
 
-Työ git-varaston osoite: <https://gitlab.jyu.fi/anlakane/ohj1ht> (*Korvaa* tämä osoite oman git-varastosi osoitteella)
+Työ git-varaston osoite: <https://github.com/leinonle/ohj1ht>
 
-Pelin nimi: (Nimi)
+Pelin nimi: Izmo Mehiläinen
 
-Pelialusta: Windows/macOS/Linux (Valitse alusta)
+Pelialusta: Windows
 
-Pelaajien lukumäärä: 1/2/3/4 (Valitse pelaajien lukumäärä)
+Pelaajien lukumäärä: 1
 
 ## Pelin tarina
 
-(Pelin tarina.)
+Ismo Laitela joutuu polttareissaan pukeutumaan mehiläiseksi. Kaverit lähettävät hänet kaupungille tehtävällä: kerää rahaa aviokassaan ja väistele esteitä, muuten häät jää pitämättä. Jokainen kolikko ja seteli vie Ismoa lähemmäs unelmahäitä – mutta pylväät, johdot ja muut kommellukset tekevät matkasta kaikkea muuta kuin helpon.
 
 ## Pelin idea ja tavoitteet
 
-(Pelin idea ja tavoitteet.)
+Flappy bird klooni, jossa kerätään kolikoita ja seteleitä, joista saa pisteitä.
+Peli jatkuu kunnes pelaaja osuu tolppaan/esteeseen.
 
 ## Hahmotelma pelistä
 
@@ -32,20 +29,33 @@ Pelaajien lukumäärä: 1/2/3/4 (Valitse pelaajien lukumäärä)
 
 ## Toteutuksen suunnitelma
 
-Helmikuu
+Lokakuu
 
-- (Tavoite 1)
-- (Tavoite 2)
-- (Tavoite 3)
+- pelaaja hahmo, joka tippuu alas päin ja pomppaa/nostaa korkeutta välilyönnillä
+    - Hyppy: tarvitsee cooldownin; Nostaa pelaaja hahmoa ylöspäin
+    - Osumien tunnistaminen: Pitää tunnistaa milloin osuu esteisiin ja milloin kolikoihin
 
-Maaliskuu
+Marraskuu
 
-- (Tavoite 1)
-- (Tavoite 2)
-- (Tavoite 3)
+- Este spawneri:
+    - Spawnaa erilaisia esteitä randomeilla korkeuksille
+- Esteet:
+    - Pelaaja ei liiku vaaka suunnassa, vaan esteet luodaan näkymän ulko puolelle oikeaan reunaan ja liikkuvat vasemmalle, kun ne on näkymän ulkona, niin ne poistetaan maailmasta
+    - Tolpat/perinteiset flappy bird esteet
+        - Spawnaa random korkeuteen ja koostuu ylä ja ala osasta
+    - Mahdolliset lentävät esteet, kuten ukkos pilvet yms.
+
+Joulukuu
+
+- Kolikot
+    - Kolikot: Tunnistaa, kun osuu pelaajaan ja antaa pelaajalle pisteen
+        - Mahdollisesti seteleitä, joista saa enemmän pisteitä
+- Tekstuurien lisäys
+- Piste ja elämä muuttujat ja "game over" handlaus
 
 Jos aikaa jää
 
-- (Tavoite 1)
-- (Tavoite 2)
-- (Tavoite 3)
+- PowerUpit: 
+    - aa zajajajaj koskemattomuus, joka disabloi esteet ja nopeuttaa maailmaa.
+    - +1 Elämät ja elämät ylipäätänsä ettei kuole heti
+
