@@ -18,44 +18,97 @@ Ismo Laitela joutuu polttareissaan pukeutumaan mehiläiseksi. Kaverit lähettäv
 
 ## Pelin idea ja tavoitteet
 
-Flappy bird klooni, jossa kerätään kolikoita ja seteleitä, joista saa pisteitä.
+Flappy bird klooni, jossa kerätään kolikoita, joista saa pisteitä.
 Peli jatkuu kunnes pelaaja osuu tolppaan/esteeseen.
 
 ## Hahmotelma pelistä
-
-(Kun olet lisännyt suunnitelmakuvan tähän hakemistoon, linkitä se tähän alle. Alla on esimerkkikuvan linkitys.)
 
 ![Esimerkkikuva](esimerkkikuva.png "Esimerkkikuva")
 
 ## Toteutuksen suunnitelma
 
-Lokakuu
+### Oliot
 
-- pelaaja hahmo, joka tippuu alas päin ja pomppaa/nostaa korkeutta välilyönnillä
-    - Hyppy: tarvitsee cooldownin; Nostaa pelaaja hahmoa ylöspäin
-    - Osumien tunnistaminen: Pitää tunnistaa milloin osuu esteisiin ja milloin kolikoihin
+- Hahmo
+    - Tarkoitus
+        - Pelaaja hahmo, joka liikkuu pystysuunnassa.
+        - Tunnistaa osumat esteisiin, jolloin peli loppuu
+        - Tippuu kokoajan alaspäin ja hyppää esim. välilyönnillä
+    - Muuttujat
+        - ? hyppyÄäni
+        - ? törmäysÄäni
+        - double painovoima
+        - double hyppyvoima
+        - int pisteet
+        - ? tekstuuri
+    - Funktiot
+        - void hyppy()
+        - void soitaÄäni(? ääni)
+        - void törmäys(Este törmäysKohde)
 
-Marraskuu
+- Tausta
+    - Tarkoitus
+        - Tausta elementit liikkuvat vasemmalle luoden illuusion pelaajan liikkeestä
+        - Kun tausta poistuu näkymästä vasemmalle, se poistetaan
+    - Muuttujat
+        - double liikenopeus
+        - ? tekstuuri
+    - Funktiot
+        - bool tarkistaNäkyvyys()
 
-- Este spawneri:
-    - Spawnaa erilaisia esteitä randomeilla korkeuksille
-- Esteet:
-    - Pelaaja ei liiku vaaka suunnassa, vaan esteet luodaan näkymän ulko puolelle oikeaan reunaan ja liikkuvat vasemmalle, kun ne on näkymän ulkona, niin ne poistetaan maailmasta
-    - Tolpat/perinteiset flappy bird esteet
-        - Spawnaa random korkeuteen ja koostuu ylä ja ala osasta
-    - Mahdolliset lentävät esteet, kuten ukkos pilvet yms.
+- Este (perii Tausta)
+    - Tarkoitus
+        - Perii tausta olion ominaisuudet erona se, että pelaaja tunnistaa osuman esteeseen
+        - Kun pelaaja osuu esteeseen, niin tarkistetaan, onko este kuolettava -> Game over
+    - Muuttujat
+        - ? törmäysAlue
+        - bool onkoKuolettava
 
-Joulukuu
+- Kerättävä (perii Este)
+    - Tarkoitus
+        - Perii esteen ja ylikirjoittaa sen onkoKuolettava arvon falsella
+        - Kerättävällä on lisänä esteeseen tuhoutuminen, kun se osuu pelaajaan, jolloin se soittaa myös äänen
+    - Muuttujat
+        - ? keräysÄäni
+    - Funktiot
+        - void tuhoutuminen()
+        - void soitaÄäni()
 
-- Kolikot
-    - Kolikot: Tunnistaa, kun osuu pelaajaan ja antaa pelaajalle pisteen
-        - Mahdollisesti seteleitä, joista saa enemmän pisteitä
-- Tekstuurien lisäys
-- Piste ja elämä muuttujat ja "game over" handlaus
+- Maailmanrajat
+    - Tarkoitus
+        - ylä- ja alarajat, jotka estävät pelaajan poistumisen pelikentältä
+        - Alaraja on kuolettava eli peli loppuu, jos pelaaja osuu siihen
+        - Periaatteessa voisi käyttää este luokkaa asettamalle nopeudeksi 0
+    - Muuttujat
+        - ? törmäysAlue
+        - bool onkoKuolettava
+
+- Maailmanluoja
+    - Tarkoitus
+        - Randomilla määrittää tietyn väliajan välein, mitä esteitä ja ympäristö olioita se peliin maailman oikeaan laitaan
+    - Muuttujat
+        - double koristeTiheys
+        - double esteTiheys
+        - double pisteTiheys
+        - double liikeNopeus
+    - Funktiot
+        - void luoEste()
+        - void luoPiste()
+        - void luoKoriste()
+        - void maailmaArpoja()
+
+
+27.10.2025 mennessä
+
+- Pelaaja hahmon luonti
+- Este ja piste oliot, jotka voi käsin lisätä peli maailmaan.
+
+28.11.2025 mennessä
+
+- Maailmanluoja olio, joka luo randomilla esteet ja pisteet maailmaan
+- Joku aloitus ja game over näkymä
 
 Jos aikaa jää
 
-- PowerUpit: 
-    - aa zajajajaj koskemattomuus, joka disabloi esteet ja nopeuttaa maailmaa.
-    - +1 Elämät ja elämät ylipäätänsä ettei kuole heti
+- Eri piste tyyppejä ja ehkä powerupit
 
