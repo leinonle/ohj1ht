@@ -35,24 +35,24 @@ Peli jatkuu kunnes pelaaja osuu tolppaan/esteeseen.
         - Tunnistaa osumat esteisiin, jolloin peli loppuu
         - Tippuu kokoajan alaspäin ja hyppää esim. välilyönnillä
     - Muuttujat
-        - ? hyppyÄäni
-        - ? törmäysÄäni
+        - SoundEffect hyppyÄäni
+        - SoundEffect törmäysÄäni
         - double painovoima
         - double hyppyvoima
         - int pisteet
-        - ? tekstuuri
+        - Image tekstuuri
     - Funktiot
         - void hyppy()
         - void soitaÄäni(? ääni)
         - void törmäys(Este törmäysKohde)
 
-- Tausta
+- Tausta (perii PhysicsObject) Done
     - Tarkoitus
         - Tausta elementit liikkuvat vasemmalle luoden illuusion pelaajan liikkeestä
         - Kun tausta poistuu näkymästä vasemmalle, se poistetaan
     - Muuttujat
         - double liikenopeus
-        - ? tekstuuri
+        - Image tekstuuri
     - Funktiot
         - bool tarkistaNäkyvyys()
 
@@ -69,7 +69,7 @@ Peli jatkuu kunnes pelaaja osuu tolppaan/esteeseen.
         - Perii esteen ja ylikirjoittaa sen onkoKuolettava arvon falsella
         - Kerättävällä on lisänä esteeseen tuhoutuminen, kun se osuu pelaajaan, jolloin se soittaa myös äänen
     - Muuttujat
-        - ? keräysÄäni
+        - SoundEffect keräysÄäni
     - Funktiot
         - void tuhoutuminen()
         - void soitaÄäni()
@@ -92,10 +92,10 @@ Peli jatkuu kunnes pelaaja osuu tolppaan/esteeseen.
         - double pisteTiheys
         - double liikeNopeus
     - Funktiot
-        - void luoEste()
-        - void luoPiste()
+        - void luoEste()    // Luo esteen radnom y-koordinaattiin kentän oikeaan reunaan
+        - void luoPiste()   // Nämä kolem voisi yhdistää niin, että ottaisi parametrinä luotavan olion tyypin
         - void luoKoriste()
-        - void maailmaArpoja()
+        - void maailmaArpoja()  // Silmukalla käyttää noita edellä mainittuja funktioita satunnaisella aikavälillä.
 
 
 27.10.2025 mennessä
