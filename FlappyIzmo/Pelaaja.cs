@@ -1,25 +1,89 @@
+/// @author Lempi Leinonen
+/// @version 26.11.2025
+/// <summary>
+/// Pelaaja luokka.
+/// </summary>
 using System;
 using Jypeli;
-using Jypeli.Effects;
 
 public class Pelaaja : PhysicsObject
 {
-    private Image pelaajanKuva = Game.LoadImage("norsu.png");
+    /// <summary>
+    /// Pelaajan tekstuuri
+    /// </summary>
+    private Image _pelaajanKuva = Game.LoadImage("ismo.png");
+
+    /// <summary>
+    /// Voima, jolla pelaaja hyppää
+    /// </summary>
     private const double HYPPYNOPEUS = 5000;
 
-    private bool voiHypata = true;
+    /// <summary>
+    /// Pistelaskuri label
+    /// </summary>
+    private Label _naytto = new Label();
 
-    private Timer ajastin;
+    /// <summary>
+    /// Taulukkko aanista, joita soitetaan pisteitä kerätessä 
+    /// </summary>
+    private SoundEffect[] _pisteAanet = new SoundEffect[]
+    {
+        Game.LoadSoundEffect("5000.wav"),
+        Game.LoadSoundEffect("noin.wav"),
+        Game.LoadSoundEffect("zajaja.wav"),
+        Game.LoadSoundEffect("kiitoksia.wav"),
+        Game.LoadSoundEffect("kassa.wav")
+    };
 
-    private IntMeter raha;
+    /// <summary>
+    /// Taulukkko aanista, joita soitetaan kuollessa 
+    /// </summary>
+    private SoundEffect[] _kuolemaAanet = new SoundEffect[]
+    {
+        Game.LoadSoundEffect("helvetti.wav"),
+        Game.LoadSoundEffect("helvettia.wav"),
+        Game.LoadSoundEffect("aijai.wav")
+    };
 
+    /// <summary>
+    /// Taulukkko aanista, joita soitetaan kuollessa 
+    /// </summary>
+    private SoundEffect[] _hyppyAanet = new SoundEffect[]
+    {
+        Game.LoadSoundEffect("bzz.wav"),
+        Game.LoadSoundEffect("bzz.wav"),
+        Game.LoadSoundEffect("bzz.wav"),
+        Game.LoadSoundEffect("szzz.wav")
+    };
+
+    /// <summary>
+    /// Muuttuja, jonka on oltava true, jotta pelaaja voi hypätä
+    /// </summary>
+    private bool _voiHypata = true;
+
+    /// <summary>
+    /// Aika sekunneissa, joka pitää odottaa hyppyjen välissä
+    /// </summary>
+    private double _hyppyOdotus = 0.2;
+
+    /// <summary>
+    /// Pelaajan rahan/pisteiden määrä
+    /// </summary>
+    public IntMeter raha;
+
+
+    /// <summary>
+    /// Pelaajan luonti funktio
+    /// </summary>
+    /// <param name="leveys">Pelaajan leveys</param>
+    /// <param name="korkeus">Pelaajan korkeus</param>
+    /// <param name="peli">Peli luokka, johon pelaaja luodaan</param>
     public Pelaaja(double leveys, double korkeus, PhysicsGame peli)
         : base(leveys, korkeus)
     {
-        // Tällä luodaan illuusio, että pelaaj liikku tietyllä nopeudella
         IgnoresCollisionResponse = false;
         IgnoresGravity = false;
-        Image = pelaajanKuva;
+        Image = _pelaajanKuva;
         // Luo esteen kentän ulkopuolelle oikeaan reunaan
         X = 0;
         Y = 0;
@@ -27,83 +91,189 @@ public class Pelaaja : PhysicsObject
         Game.Add(this);
         LisaaNappaimet();
         raha = LuoPisteLaskuri();
-        //    Paivitus();
+        // Tunnistaa osumat muihin pisteisiin ja esteisiin
         peli.AddCollisionHandler<PhysicsObject, Este>(this, EsteOsuma);
         peli.AddCollisionHandler<PhysicsObject, Piste>(this, PisteOsuma);
+        // Jos kentän ulkopuolella -> game over
+        peli.AddCustomHandler(OnUlkona, Kuolema);
+        // Estää vaaka suunnan liikkeen
+        peli.AddCustomHandler(LiikkuuX, PysaytaX);
 
-
-
-        Game.AddCustomHandler(OnUlkona, Kuolema);
     }
 
+
+    /// <summary>
+    /// Tarkistaa, liikkuuko pelaaja vaaka suunnassa
+    /// </summary>
+    /// <returns>True, jos pelaaja liikkuu</returns>
+    private bool LiikkuuX()
+    {
+        if (this.Velocity.X != 0) return true;
+        else return false;
+    }
+
+
+    /// <summary>
+    /// Pysayttaa pelaajan vaaka suuntaisen liikkeen
+    /// </summary>
+    private void PysaytaX()
+    {
+        this.Velocity = new Vector(0, Velocity.Y);
+    }
+
+
+    /// <summary>
+    /// Luo piste laskurin
+    /// </summary>
+    /// <returns>Palauttaa luodun pistelaskurin</returns>
     private IntMeter LuoPisteLaskuri()
     {
-        IntMeter laskuri = new IntMeter(0); 
-        laskuri.MaxValue = 100;
-        
-        // Tekstikentän luonti
-        Label naytto = new Label();
+        IntMeter laskuri = new IntMeter(0);
+        laskuri.MaxValue = 10000;
+
         // asettaa nayton nayttamaan laskuri muuttujan arvon
-        naytto.BindTo(laskuri);
+        _naytto.BindTo(laskuri);
         // Asettaa parametreina annetut koordinaatit naytolle
-        naytto.X = Game.Level.Left + 50;
-        naytto.Y = Game.Level.Top - 50;
+        _naytto.X = Game.Level.Left + 50;
+        _naytto.Y = Game.Level.Top - 50;
         // asettaa varit naytolle
-        naytto.TextColor = Color.White;
-        naytto.BorderColor = Game.Level.Background.Color;
-        naytto.Color = Game.Level.Background.Color;
-        Game.Add(naytto);
-        
+        _naytto.TextColor = Color.White;
+        _naytto.BorderColor = Game.Level.Background.Color;
+        _naytto.Color = Game.Level.Background.Color;
+        Game.Add(_naytto);
+
         return laskuri;
     }
 
+
+    /// <summary>
+    /// Funktio, jota collision handler kutsuu kun osutaan esteeseen
+    /// </summary>
+    /// <param name="pelaaja">Pelaaja, jonka osumaa seurataan</param>
+    /// <param name="asia">Este johon pelaaja osuu</param>
     private void EsteOsuma(PhysicsObject pelaaja, Tausta asia)
     {
         Kuolema();
     }
 
+
+    /// <summary>
+    ///  Funktio, jota collision handler kutsuu, kun pelaaja osuu pisteeseen
+    /// </summary>
+    /// <param name="pelaaja">Pelaaja, jonka osumaa seurataan.</param>
+    /// <param name="asia">Piste johon pelaaja on osunut</param>
     private void PisteOsuma(PhysicsObject pelaaja, Tausta asia)
     {
+        this.Move(new Vector(0, Velocity.Y));
         raha.Value += 1;
-        asia.Destroy();
+        SoitaRandomAani(_pisteAanet);
+        Game.MessageDisplay.Add("Keräsit tähden!");
+        asia.Poista();
     }
 
-    private bool OnUlkona()
+
+    /// <summary>
+    /// Valitsee satunnaisen äänen taulukosta, jossa on SoundEffect olioita ja soittaa sen.
+    /// </summary>
+    /// <param name="aanet">Taulukko äänistä</param>
+    private void SoitaRandomAani(SoundEffect[] aanet)
     {
-        // Jos pelaaja on maailman ylä tai ala laidan ulkopuolella palauttaa true
-        // Muuten palauttaa false
-        if (this.Y > Game.Level.Top) return true;
-        else if (this.Y < Game.Level.Bottom) return true;
-        return false;
+        if (aanet.Length == 0) return;
+        int i = RandomGen.NextInt(0, aanet.Length);
+        aanet[i].Play();
     }
 
+
+    /// <summary>
+    /// Funktio, joka näyttää lopetus ruudun ja käynnistää pelin resetoinnnin
+    /// </summary>
     public void Kuolema()
     {
+        // Näyttää viestin, kun pelaaja kuolee
+        Game.MessageDisplay.Clear();
+        switch (raha)
+        {
+            case 0:
+                Game.MessageDisplay.Add($"Kuolit! Et keränny yhtään kolikkoa.", Color.Red);
+                break;
+
+            case 1:
+                Game.MessageDisplay.Add($"Kuolit! Keräsit {raha} kolikon.", Color.Red);
+                break;
+
+            default:
+                Game.MessageDisplay.Add($"Kuolit! Keräsit {raha} kolikkoa.", Color.Red);
+                break;
+        }
+
+        Game.MessageDisplay.X = 0;
+        Game.MessageDisplay.Y = 0;
+        SoitaRandomAani(_kuolemaAanet);
+        // Poistaa pelaajan aja aloittaa peli alusta
         this.Destroy();
-        Timer.SingleShot(2, Uudestaan);
+        _naytto.Destroy();
+        Timer.SingleShot(3, Uudestaan);
     }
 
+
+    /// <summary>
+    /// Kutsuu pelin Begin funktioita
+    /// </summary>
     private void Uudestaan()
     {
         Game.Begin();
     }
 
+
+    /// <summary>
+    /// Hyppää ja käynnistää nopean ajastimen, joka estää hypyn spammaamisen
+    /// </summary>
+    /// <param name="nopeus"></param>
     private void Hyppaa(double nopeus)
     {
-        if (!voiHypata) return;
-        voiHypata = false;
-        Timer.SingleShot(0.33, ValmisHyppaamaan);
+        if (X != 0) X = 0;
+        if (!_voiHypata) return;
+        //Estää hypyn spämmäämisen
+        _voiHypata = false;
+        // Ajastin joka resetoi _voiHypata muuttuja takaisin true
+        Timer.SingleShot(_hyppyOdotus, ValmisHyppaamaan);
+        // Asettaa pelaajan pysty suunnan liikkeen nollaan ennen hyppyä, jotta suuren pudeotuksen jälkeen hyppy ei ole tehoton
         if (Velocity.Y < 0) this.Velocity = new Vector(0, 0);
+        // Hyppy
         this.Hit(new Vector(0, nopeus));
+        SoitaRandomAani(_hyppyAanet);
     }
 
+
+    /// <summary>
+    /// Resetoi hyppy valmiuden, kun ajastin Hyppaa funktiossa on valmis,
+    /// </summary>
     private void ValmisHyppaamaan()
     {
-        voiHypata = true;
+        _voiHypata = true;
     }
 
+
+    /// <summary>
+    /// Lisää hypp nappin peliin
+    /// </summary>
     private void LisaaNappaimet()
     {
         Game.Keyboard.Listen(Key.Space, ButtonState.Pressed, Hyppaa, "Pelaaja hyppää", HYPPYNOPEUS);
+    }
+
+
+    /// <summary>
+    /// Tarkistaa, onko pelaaja kentän ulkopuolella.
+    /// </summary>
+    /// <returns>Jos ulkopuolella, niin true</returns>
+    private bool OnUlkona()
+    {
+        if (this.Y < Game.Level.Bottom || this.Y > Game.Level.Top)
+        {
+            this.Y = 0; // Korjaa bugin, joka looppasi pelin aloitusta, kun pelaaja putosi maailmasta.
+            return true;
+        }
+        return false;
     }
 }

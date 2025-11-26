@@ -23,6 +23,45 @@
         <None Update="Content\tahti.png">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
+        <None Update="Content\ismo.png">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>    
+        <None Update="Content\kolikko.png">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>    
+        <None Update="Content\pilvi.png">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>    
+        <None Update="Content\5000.wav">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>    
+        <None Update="Content\aijai.wav">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>    
+        <None Update="Content\helvetti.wav">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>    
+        <None Update="Content\noin.wav">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>    
+        <None Update="Content\zajaja.wav">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>    
+        <None Update="Content\helvettia.wav">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>    
+        <None Update="Content\bzz.wav">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>    
+        <None Update="Content\kassa.wav">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>    
+        <None Update="Content\kiitoksia.wav">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>    
+        <None Update="Content\szzz.wav">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>    
     </ItemGroup>
 
 </Project>
