@@ -50,6 +50,7 @@ public class Pelaaja : PhysicsObject
     /// </summary>
     private SoundEffect[] _hyppyAanet = new SoundEffect[]
     {
+        // Sama ääni 3 kertaa, jotta ärsyttävämpi soi vain 25% todennäkösyydellä
         Game.LoadSoundEffect("bzz.wav"),
         Game.LoadSoundEffect("bzz.wav"),
         Game.LoadSoundEffect("bzz.wav"),
@@ -91,9 +92,10 @@ public class Pelaaja : PhysicsObject
         Game.Add(this);
         LisaaNappaimet();
         raha = LuoPisteLaskuri();
-        // Tunnistaa osumat muihin pisteisiin ja esteisiin
-        peli.AddCollisionHandler<PhysicsObject, Este>(this, EsteOsuma);
-        peli.AddCollisionHandler<PhysicsObject, Piste>(this, PisteOsuma);
+        
+        // Tunnistaa osumat pisteisiin ja esteisiin
+        peli.AddCollisionHandler(this, "este", EsteOsuma);
+        peli.AddCollisionHandler(this, "piste", PisteOsuma);
         // Jos kentän ulkopuolella -> game over
         peli.AddCustomHandler(OnUlkona, Kuolema);
         // Estää vaaka suunnan liikkeen
@@ -136,7 +138,7 @@ public class Pelaaja : PhysicsObject
         // Asettaa parametreina annetut koordinaatit naytolle
         _naytto.X = Game.Level.Left + 50;
         _naytto.Y = Game.Level.Top - 50;
-        // asettaa varit naytolle
+        // asettaa värit naytolle
         _naytto.TextColor = Color.White;
         _naytto.BorderColor = Game.Level.Background.Color;
         _naytto.Color = Game.Level.Background.Color;
@@ -151,7 +153,7 @@ public class Pelaaja : PhysicsObject
     /// </summary>
     /// <param name="pelaaja">Pelaaja, jonka osumaa seurataan</param>
     /// <param name="asia">Este johon pelaaja osuu</param>
-    private void EsteOsuma(PhysicsObject pelaaja, Tausta asia)
+    private void EsteOsuma(PhysicsObject pelaaja, PhysicsObject asia)
     {
         Kuolema();
     }
@@ -162,12 +164,17 @@ public class Pelaaja : PhysicsObject
     /// </summary>
     /// <param name="pelaaja">Pelaaja, jonka osumaa seurataan.</param>
     /// <param name="asia">Piste johon pelaaja on osunut</param>
-    private void PisteOsuma(PhysicsObject pelaaja, Tausta asia)
+    private void PisteOsuma(PhysicsObject pelaaja, PhysicsObject asia)
     {
-        this.Move(new Vector(0, Velocity.Y));
+        this.Move(new Vector(0, Velocity.Y)); // Estää liikkumisen vaakasuunnassa törmättäessä pisteeseen
         raha.Value += 1;
         SoitaRandomAani(_pisteAanet);
-        Game.MessageDisplay.Add("Keräsit tähden!");
+        Game.MessageDisplay.Add("Keräsit kolikon!");
+        if (asia is Tausta tausta) tausta.Poista();
+    }
+
+    private void PoistaPiste(Tausta asia)
+    {
         asia.Poista();
     }
 
@@ -231,14 +238,17 @@ public class Pelaaja : PhysicsObject
     /// <param name="nopeus"></param>
     private void Hyppaa(double nopeus)
     {
-        if (X != 0) X = 0;
-        if (!_voiHypata) return;
-        //Estää hypyn spämmäämisen
+        if (X != 0) X = 0; // Toinen tapa pitää pelaaja vaaka suunnassa paikoillaan.
+        
+        // Estää hypyn spämmäämisen
+        if (!_voiHypata) return; 
         _voiHypata = false;
         // Ajastin joka resetoi _voiHypata muuttuja takaisin true
         Timer.SingleShot(_hyppyOdotus, ValmisHyppaamaan);
+
         // Asettaa pelaajan pysty suunnan liikkeen nollaan ennen hyppyä, jotta suuren pudeotuksen jälkeen hyppy ei ole tehoton
         if (Velocity.Y < 0) this.Velocity = new Vector(0, 0);
+
         // Hyppy
         this.Hit(new Vector(0, nopeus));
         SoitaRandomAani(_hyppyAanet);

@@ -4,6 +4,7 @@
 /// 
 /// </summary>
 using System;
+using System.Collections.Generic;
 using Jypeli;
 
 public class FlappyIzmo : PhysicsGame
@@ -24,11 +25,11 @@ public class FlappyIzmo : PhysicsGame
     /// Kun taulukko on tyhjä luodaan uusi setti esteitä eli käytännössä uusi taso
     /// Taulukosta poistetaan Olioita sitä mukaa, kun ne poistuvat kentästä
     /// </summary>
-    private Tausta[] _maailmaOliot = [];
+    private List<Tausta> _maailmaOliot = new List<Tausta>();
 
     /// <summary>
     /// Taso/kierros, johon pelaaja on päässyt.
-    /// Korkeampi tasi -> vaikeampaa
+    /// Korkeampi taso -> vaikeampaa
     /// </summary>
     public int _taso = 0;
 
@@ -65,13 +66,11 @@ public class FlappyIzmo : PhysicsGame
         _pisteTiheys = 2000;
         _kentanPituus = 2000;
 
-        for (int i = 0; i < _maailmaOliot.Length; i++)
-        {
-            PoistaMaailmaOlio(_maailmaOliot[i]);
-        }
+        ClearAll();
+
         Gravity = new Vector(0, -1500);
         LuoKentta(); // Luo maailman
-        MasterVolume = 0.3; // Ei ole viela ääniä, mutta varmaan hyödyllinen
+        MasterVolume = 0.1;
     }
 
 
@@ -97,7 +96,7 @@ public class FlappyIzmo : PhysicsGame
     private bool OnkoTyhja()
     {
         // Palauttaa true, jos maailmaolioita ei ole olemassa
-        if (_maailmaOliot.Length == 0) return true;
+        if (_maailmaOliot.Count == 0) return true;
         return false;
     }
 
@@ -107,6 +106,7 @@ public class FlappyIzmo : PhysicsGame
     /// </summary>
     private void SeuraavaTaso()
     {
+        // Lasketaan uuden tason vaikeus eli esteiden tiheys
         if (_pelaaja != null) _taso += _pelaaja.raha / 10; //Pisteet lisää haastetta
         _taso += 1;
 
@@ -115,8 +115,9 @@ public class FlappyIzmo : PhysicsGame
         _esteTiheys = Math.Max(_esteTiheys - vaikeus * 10, 100);
         _pisteTiheys = Math.Max(_pisteTiheys - vaikeus * 10, 200);   // ei mene negatiiviseksi
 
-        _kentanPituus = _kentanPituus + _taso * 150;   // skaalautuu siististi
+        _kentanPituus = _kentanPituus + _taso * 150;
 
+        // Luodaan uusi taso
         LuoMaailma("este", _esteTiheys, _kentanPituus);
         LuoMaailma("piste", _pisteTiheys, _kentanPituus);
         LuoMaailma("tausta", _pisteTiheys/2, _kentanPituus);
@@ -134,7 +135,7 @@ public class FlappyIzmo : PhysicsGame
         int vali = Convert.ToInt32(tiheys); // Kuinka suuret välit esteiden välillä on
         Console.WriteLine(vali);
         if (vali < 20) vali = 20; // kaatuu ilman
-        // Luodaan silmukalla kenttä
+
         // Luo FOR loopilla olioita random korkeudelle tietyllä välimatkalla
         for (int i = 0; i < pituus; i++)
         {
@@ -154,7 +155,7 @@ public class FlappyIzmo : PhysicsGame
     /// <param name="tyyppi">Luotavan olion tyyppi eli luokka</param>
     /// <param name="x">X-koordinaatti</param>
     /// <param name="y">Y-koordinaatti</param>
-    private void LisaaMaailmaOlio(String tyyppi, double x, double y)
+    private void LisaaMaailmaOlio(string tyyppi, double x, double y)
     {
         // Voisi lisata random koon.
         Tausta olio = null;
@@ -162,15 +163,21 @@ public class FlappyIzmo : PhysicsGame
         {
             case "tausta":
                 olio = new Tausta(560, 480, _pelaajanNopeus, x, y, this);
+                olio.Tag = "tausta";
+                olio.Image = Game.LoadImage("pilvi");
                 break;
 
             case "piste":
-                olio = new Piste(140, 120, _pelaajanNopeus, x, y, this);
+                olio = new Tausta(140, 120, _pelaajanNopeus + 200, x, y, this);
+                olio.Tag = "piste";
+                olio.Image = Game.LoadImage("kolikko");
                 break;
 
             case "este":
                 double koko = RandomGen.NextDouble(40, 120);
-                olio = new Este(koko, koko, _pelaajanNopeus, x, y, this);
+                olio = new Tausta(koko, koko, _pelaajanNopeus + 100, x, y, this);
+                olio.Tag = "este";
+                olio.Image = Game.LoadImage("norsu");
                 break;
 
             default:
@@ -178,38 +185,18 @@ public class FlappyIzmo : PhysicsGame
                 break;
         }
         if (olio == null) return;
-        int lkm = _maailmaOliot.Length;
-        // Lisää olion _maailmaOliot-taulukoon
-        Tausta[] uudetOliot = new Tausta[lkm + 1];
-        for (int i = 0; i < lkm; i++)
-        {
-            uudetOliot[i] = _maailmaOliot[i];
-        }
-        uudetOliot[lkm] = olio;
-        _maailmaOliot = uudetOliot;
+        _maailmaOliot.Add(olio);
     }
 
     
     /// <summary>
     /// Poistaa yksittäisen maailma olion _maailmaOliot taulukosta
+    /// Vaihtaa samalla taulukon pituuden vastaamaan tausta olioden määrää
     /// </summary>
     /// <param name="olio">Poistettava olio</param>
     public void PoistaMaailmaOlio(Tausta olio)
     {
-        int lkm = _maailmaOliot.Length;
-        Tausta[] uudetOliot = new Tausta[lkm - 1];
-
-        int uusiI = 0;
-        for (int i = 0; i < lkm; i++)
-        {
-            if (_maailmaOliot[i] == olio)
-                continue;
-
-            uudetOliot[uusiI] = _maailmaOliot[i];
-            uusiI++;
-        }
-
-        _maailmaOliot = uudetOliot;
+        _maailmaOliot.Remove(olio); 
         olio.Destroy();
     }
 }

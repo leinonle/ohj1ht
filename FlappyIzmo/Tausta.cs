@@ -1,14 +1,7 @@
-using System;
 using Jypeli;
-using Silk.NET.OpenGL;
 
 public class Tausta : PhysicsObject
 {
-    /// <summary>
-    /// Nopeus joka lisataan pelaajan nopeuteen
-    /// </summary>
-    private double _nopeus = 0;
-
     /// <summary>
     /// Pitää kirjaa, onko tuhottu. Muistaakseni tein tämän bugin korjausta varten
     /// </summary>
@@ -29,18 +22,15 @@ public class Tausta : PhysicsObject
     /// <param name="x">X-koordinaatti, johon luodaan</param>
     /// <param name="y">Y-koordinaatti, johon luodaan</param>
     /// <param name="peli">Peli olio, jossa tämä on luotu</param>
-    public Tausta(double leveys, double korkeus, double pelaajanNopeus, double x, double y, FlappyIzmo peli)
+    public Tausta(double leveys, double korkeus, double nopeus, double x, double y, FlappyIzmo peli)
         : base(leveys, korkeus)
     {
         // Tällä luodaan illuusio, että pelaaj liikku tietyllä nopeudella
         PELI = peli;
-        _nopeus += pelaajanNopeus;
         IgnoresCollisionResponse = true;
         IgnoresGravity = true;
-        Image texture = Game.LoadImage("pilvi");
-        Image = texture;
         // Asettaa esteelle nopeuden
-        Velocity = new Vector(-_nopeus, 0);
+        Velocity = new Vector(-nopeus, 0);
         // Luo esteen kentän ulkopuolelle oikeaan reunaan
         X = x + leveys * 2;
         Y = y;
