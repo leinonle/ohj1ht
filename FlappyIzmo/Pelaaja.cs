@@ -1,5 +1,5 @@
 /// @author Lempi Leinonen
-/// @version 26.11.2025
+/// @version 3.12.2025
 /// <summary>
 /// Pelaaja luokka.
 /// </summary>
@@ -16,7 +16,7 @@ public class Pelaaja : PhysicsObject
     /// <summary>
     /// Voima, jolla pelaaja hyppää
     /// </summary>
-    private const double HYPPYNOPEUS = 5000;
+    private const double HyppyNopeus = 5000;
 
     /// <summary>
     /// Pistelaskuri label
@@ -97,9 +97,9 @@ public class Pelaaja : PhysicsObject
         peli.AddCollisionHandler(this, "este", EsteOsuma);
         peli.AddCollisionHandler(this, "piste", PisteOsuma);
         // Jos kentän ulkopuolella -> game over
-        peli.AddCustomHandler(OnUlkona, Kuolema);
+        peli.AddCustomHandler(OnkoUlkona, Kuolema);
         // Estää vaaka suunnan liikkeen
-        peli.AddCustomHandler(LiikkuuX, PysaytaX);
+        peli.AddCustomHandler(LiikkuukoX, PysaytaX);
 
     }
 
@@ -108,7 +108,7 @@ public class Pelaaja : PhysicsObject
     /// Tarkistaa, liikkuuko pelaaja vaaka suunnassa
     /// </summary>
     /// <returns>True, jos pelaaja liikkuu</returns>
-    private bool LiikkuuX()
+    private bool LiikkuukoX()
     {
         if (this.Velocity.X != 0) return true;
         else return false;
@@ -169,13 +169,19 @@ public class Pelaaja : PhysicsObject
         this.Move(new Vector(0, Velocity.Y)); // Estää liikkumisen vaakasuunnassa törmättäessä pisteeseen
         raha.Value += 1;
         SoitaRandomAani(_pisteAanet);
+        Pyorita(asia);
         Game.MessageDisplay.Add("Keräsit kolikon!");
         if (asia is Tausta tausta) tausta.Poista();
     }
 
-    private void PoistaPiste(Tausta asia)
+
+    private void Pyorita(PhysicsObject asia)
     {
-        asia.Poista();
+        this.AngularVelocity = AngularVelocity / 2;
+        double maxVauhti = 2.5;
+        double vauhti = 0 + Random.Shared.NextDouble() * (maxVauhti - 0);
+        if (Y > asia.Y) this.AngularVelocity += vauhti;
+        else this.AngularVelocity -= vauhti;
     }
 
 
@@ -197,6 +203,7 @@ public class Pelaaja : PhysicsObject
     public void Kuolema()
     {
         // Näyttää viestin, kun pelaaja kuolee
+        // Erikois tapaukset 0 ja 1 pisteelle
         Game.MessageDisplay.Clear();
         switch (raha)
         {
@@ -216,7 +223,7 @@ public class Pelaaja : PhysicsObject
         Game.MessageDisplay.X = 0;
         Game.MessageDisplay.Y = 0;
         SoitaRandomAani(_kuolemaAanet);
-        // Poistaa pelaajan aja aloittaa peli alusta
+        // Poistaa pelaajan ja aloittaa peli alusta
         this.Destroy();
         _naytto.Destroy();
         Timer.SingleShot(3, Uudestaan);
@@ -269,7 +276,7 @@ public class Pelaaja : PhysicsObject
     /// </summary>
     private void LisaaNappaimet()
     {
-        Game.Keyboard.Listen(Key.Space, ButtonState.Pressed, Hyppaa, "Pelaaja hyppää", HYPPYNOPEUS);
+        Game.Keyboard.Listen(Key.Space, ButtonState.Pressed, Hyppaa, "Pelaaja hyppää", HyppyNopeus);
     }
 
 
@@ -277,7 +284,7 @@ public class Pelaaja : PhysicsObject
     /// Tarkistaa, onko pelaaja kentän ulkopuolella.
     /// </summary>
     /// <returns>Jos ulkopuolella, niin true</returns>
-    private bool OnUlkona()
+    private bool OnkoUlkona()
     {
         if (this.Y < Game.Level.Bottom || this.Y > Game.Level.Top)
         {

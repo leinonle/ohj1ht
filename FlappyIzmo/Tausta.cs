@@ -1,12 +1,12 @@
+/// @author Lempi Leinonen
+/// @version 3.12.2025
+/// <summary>
+/// Luokka jota käytetään Pilviin, esteisiin ja pisteisiin
+/// </summary>
 using Jypeli;
 
 public class Tausta : PhysicsObject
 {
-    /// <summary>
-    /// Pitää kirjaa, onko tuhottu. Muistaakseni tein tämän bugin korjausta varten
-    /// </summary>
-    private bool tuhottu = false;
-
     /// <summary>
     /// Peli olio, jonka siällä tämä on luotu
     /// </summary>
@@ -59,12 +59,7 @@ public class Tausta : PhysicsObject
     /// </summary>
     public void Poista()
     {
-        if (!tuhottu)
-        {
-            PELI.PoistaMaailmaOlio(this);
-            tuhottu = true;
-            this.Destroy();
-        }
+        PELI.PoistaMaailmaOlio(this);
     }
 
 }

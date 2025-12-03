@@ -1,5 +1,5 @@
 /// @author Lempi Leinonen
-/// @version 22.09.2025
+/// @version 3.12.2025
 /// <summary>
 /// 
 /// </summary>
@@ -21,9 +21,9 @@ public class FlappyIzmo : PhysicsGame
     private Pelaaja _pelaaja = null;
 
     /// <summary>
-    /// Taulukko kaikista Tausta oliosta joita maailmassa on
-    /// Kun taulukko on tyhjä luodaan uusi setti esteitä eli käytännössä uusi taso
-    /// Taulukosta poistetaan Olioita sitä mukaa, kun ne poistuvat kentästä
+    /// Lista kaikista Tausta oliosta joita maailmassa on
+    /// Kun lista on tyhjä luodaan uusi setti esteitä eli käytännössä uusi taso
+    /// Listasta poistetaan Olioita sitä mukaa, kun ne poistuvat kentästä
     /// </summary>
     private List<Tausta> _maailmaOliot = new List<Tausta>();
 
@@ -67,6 +67,8 @@ public class FlappyIzmo : PhysicsGame
         _kentanPituus = 2000;
 
         ClearAll();
+        // Resetoi listan, jotta pelin uudelleen aloittaminen toimii.
+        _maailmaOliot = new List<Tausta>();
 
         Gravity = new Vector(0, -1500);
         LuoKentta(); // Luo maailman
@@ -106,6 +108,7 @@ public class FlappyIzmo : PhysicsGame
     /// </summary>
     private void SeuraavaTaso()
     {
+        Console.WriteLine("UusiTase");
         // Lasketaan uuden tason vaikeus eli esteiden tiheys
         if (_pelaaja != null) _taso += _pelaaja.raha / 10; //Pisteet lisää haastetta
         _taso += 1;
