@@ -1,7 +1,7 @@
 /// @author Lempi Leinonen
 /// @version 3.12.2025
 /// <summary>
-/// 
+/// Peli luokka
 /// </summary>
 using System;
 using System.Collections.Generic;
@@ -13,7 +13,7 @@ public class FlappyIzmo : PhysicsGame
     /// <summary>
     /// Nopeus, jota kaikki tausta oliot kulkevat vähintään
     /// </summary>
-    private double _pelaajanNopeus = 400;
+    private double _taustanNopeus = 400;
 
     /// <summary>
     /// Pelaaja
@@ -153,42 +153,40 @@ public class FlappyIzmo : PhysicsGame
 
 
     /// <summary>
-    /// Luo yksittäisen maailma olion annettuun koordinaattiin
+    /// Luo yksittäisen maailmaolion annettuun koordinaattiin
     /// </summary>
     /// <param name="tyyppi">Luotavan olion tyyppi eli luokka</param>
     /// <param name="x">X-koordinaatti</param>
     /// <param name="y">Y-koordinaatti</param>
     private void LisaaMaailmaOlio(string tyyppi, double x, double y)
     {
-        // Voisi lisata random koon.
         Tausta olio = null;
         switch (tyyppi)
         {
             case "tausta":
-                olio = new Tausta(560, 480, _pelaajanNopeus, x, y, this);
+                olio = new Tausta(560, 480, _taustanNopeus, x, y, this);
                 olio.Tag = "tausta";
-                olio.Image = Game.LoadImage("pilvi");
+                olio.Image = LoadImage("pilvi");
                 break;
 
             case "piste":
-                olio = new Tausta(140, 120, _pelaajanNopeus + 200, x, y, this);
+                olio = new Tausta(140, 120, _taustanNopeus + 200, x, y, this);
                 olio.Tag = "piste";
-                olio.Image = Game.LoadImage("kolikko");
+                olio.Image = LoadImage("kolikko");
                 break;
 
             case "este":
                 double koko = RandomGen.NextDouble(40, 120);
-                olio = new Tausta(koko, koko, _pelaajanNopeus + 100, x, y, this);
+                olio = new Tausta(koko, koko, _taustanNopeus + 100, x, y, this);
                 olio.Tag = "este";
-                olio.Image = Game.LoadImage("norsu");
+                olio.Image = LoadImage("norsu");
                 break;
 
             default:
-                olio = new Tausta(40, 40, _pelaajanNopeus, x, y, this);
+                olio = new Tausta(40, 40, _taustanNopeus, x, y, this);
                 break;
         }
-        if (olio == null) return;
-        _maailmaOliot.Add(olio);
+        if (olio != null) _maailmaOliot.Add(olio); // Lisätään luotu olio maailmaOliot listaan
     }
 
     

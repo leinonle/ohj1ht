@@ -174,13 +174,16 @@ public class Pelaaja : PhysicsObject
         if (asia is Tausta tausta) tausta.Poista();
     }
 
-
+    /// <summary>
+    /// Pyörittää pelaajaa, kun se osuu pisteeseen.
+    /// </summary>
+    /// <param name="asia"></param>
     private void Pyorita(PhysicsObject asia)
     {
         this.AngularVelocity = AngularVelocity / 2;
         double maxVauhti = 2.5;
         double vauhti = 0 + Random.Shared.NextDouble() * (maxVauhti - 0);
-        if (Y > asia.Y) this.AngularVelocity += vauhti;
+        if (Y < asia.Y) this.AngularVelocity += vauhti;
         else this.AngularVelocity -= vauhti;
     }
 
